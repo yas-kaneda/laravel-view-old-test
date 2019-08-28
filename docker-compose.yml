@@ -1,0 +1,44 @@
+version: '3'
+volumes:
+  bundle:
+  mysql:
+services:
+  app:
+    build: .
+    ports:
+      - 8080:8000
+    volumes:
+      - bundle:/usr/local/bundle
+      - .:/usr/src/app:delegated
+    links:
+      - mysql
+    stdin_open: true
+    tty: true
+    command: /bin/sh -c "composer install; npm install; composer dump-autoload; php artisan serve --host=0.0.0.0"
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    ports:
+      - '13306:3306'
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: homestead
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+
+  mysql-testing:
+    image: mysql:5.7
+    ports:
+      - '23306:3306'
+    volumes:
+      - mysql:/var/lib/mysql-testing
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: asc_testing
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_USER: root
+      MYSQL_PASSWORD:
